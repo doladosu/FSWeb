@@ -3,8 +3,7 @@
   var app = angular.module('fanSelectorApp',
   ['ngRoute', 'ngAnimate', 'wc.directives', 'ui.bootstrap', 'LocalStorageModule']);
 
-  app.config([
-    '$routeProvider', function($routeProvider) {
+  app.config(['$routeProvider', function($routeProvider) {
       var viewBase = '/app/fanSelectorApp/views/';
 
       $routeProvider
@@ -23,6 +22,18 @@
         .when('/contest', {
           controller: 'ContestController',
           templateUrl: viewBase + 'contests/contest.html',
+          controllerAs: 'vm',
+          secure: true
+        })
+        .when('/profile', {
+          controller: 'ProfileController',
+          templateUrl: viewBase + 'account/profile.html',
+          controllerAs: 'vm',
+          secure: true
+        })
+        .when('/transaction', {
+          controller: 'TransactionController',
+          templateUrl: viewBase + 'account/transaction.html',
           controllerAs: 'vm',
           secure: true
         })
@@ -57,17 +68,14 @@
           templateUrl: viewBase + 'login.html',
           controllerAs: 'vm'
         })
-        .otherwise({ redirectTo: '/customers' });
+        .otherwise({ redirectTo: '/lobby' });
 
     }
   ]);
 
-  app.run([
-    '$rootScope', '$location', 'authService',
-    function($rootScope, $location, authService) {
-
-      //Client-side security. Server-side framework MUST add it's 
-      //own security as well since client-based security is easily hacked
+  app.run(['$rootScope', '$location', 'authService',
+    function ($rootScope, $location, authService) {
+      authService.fillAuthData();
       $rootScope.$on("$routeChangeStart", function(event, next, current) {
         if (next && next.$$route && next.$$route.secure) {
           if (!authService.user.isAuthenticated) {
@@ -77,7 +85,6 @@
           }
         }
       });
-
     }
   ]);
 

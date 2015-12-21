@@ -37,7 +37,7 @@
       return deferred.promise;
     };
 
-    factory.logout = function () {
+    factory.logout = function() {
       localStorageService.remove('authorizationData');
       user.email = '';
       changeAuth(false);
