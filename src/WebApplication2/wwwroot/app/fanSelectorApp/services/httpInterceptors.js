@@ -1,35 +1,49 @@
-﻿(function () {
+﻿(function() {
 
-    angular.module('fanSelectorApp')
-        .config(['$httpProvider', function ($httpProvider) {
+  angular.module('fanSelectorApp')
+    .config([
+      '$httpProvider', 'localStorageService', function($httpProvider, localStorageService) {
 
         var injectParams = ['$q', '$rootScope'];
 
-        var httpInterceptor401 = function ($q, $rootScope) {
+        var request = function(config) {
 
-            var success = function (response) {
-                return response;
-            };
+          config.headers = config.headers || {};
 
-            var error = function (res) {
-                if (res.status === 401) {
-                    //Raise event so listener (navbarController) can act on it
-                    $rootScope.$broadcast('redirectToLogin', null);
-                    return $q.reject(res);
-                }
-                return $q.reject(res);
-            };
+          var authData = localStorageService.get('authorizationData');
+          if (authData) {
+            config.headers.Authorization = 'Bearer ' + authData.token;
+          }
 
-            return function (promise) {
-                return promise.then(success, error);
-            };
+          return config;
+        }
+
+        var httpInterceptor401 = function($q, $rootScope) {
+
+          var success = function(response) {
+            return response;
+          };
+
+          var error = function(res) {
+            if (res.status === 401) {
+              //Raise event so listener (navbarController) can act on it
+              $rootScope.$broadcast('redirectToLogin', null);
+              return $q.reject(res);
+            }
+            return $q.reject(res);
+          };
+
+          return function(promise) {
+            return promise.then(success, error);
+          };
 
         };
 
         httpInterceptor401.$inject = injectParams;
 
+        $httpProvider.interceptors.push(request);
         $httpProvider.interceptors.push(httpInterceptor401);
 
-    }]);
-
+      }
+    ]);
 }());

@@ -1,7 +1,7 @@
 ﻿(function () {
 
     var value = {
-        useBreeze: false
+      clientId: 'FanSelectorWeb'
     };
 
     angular.module('fanSelectorApp').value('config', value);
